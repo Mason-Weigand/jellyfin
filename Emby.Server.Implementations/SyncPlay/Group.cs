@@ -115,9 +115,9 @@ namespace Emby.Server.Implementations.SyncPlay
         public string GroupName { get; private set; }
 
         /// <summary>
-        /// Gets the group identifier.
+        /// Gets the play queue.
         /// </summary>
-        /// <value>The group identifier.</value>
+        /// <value>The play queue.</value>
         public PlayQueueManager PlayQueue { get; } = new PlayQueueManager();
 
         /// <summary>
@@ -137,6 +137,15 @@ namespace Emby.Server.Implementations.SyncPlay
         /// </summary>
         /// <value>The last activity.</value>
         public DateTime LastActivity { get; set; }
+
+        /// <summary>
+        /// Gets current participants.
+        /// </summary>
+        /// <returns>The list of sessions in the group.</returns>
+        public IEnumerable<string> GetParticipants()
+        {
+            return _participants.Values.Select(member => member.SessionId);
+        }
 
         /// <summary>
         /// Adds the session to the group.
