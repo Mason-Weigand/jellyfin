@@ -3,6 +3,7 @@ using Jellyfin.Data.Events.Users;
 using Jellyfin.Server.Implementations.Events.Consumers.Library;
 using Jellyfin.Server.Implementations.Events.Consumers.Security;
 using Jellyfin.Server.Implementations.Events.Consumers.Session;
+using Jellyfin.Server.Implementations.Events.Consumers.SyncPlay;
 using Jellyfin.Server.Implementations.Events.Consumers.System;
 using Jellyfin.Server.Implementations.Events.Consumers.Updates;
 using Jellyfin.Server.Implementations.Events.Consumers.Users;
@@ -43,6 +44,9 @@ namespace Jellyfin.Server.Implementations.Events
             collection.AddScoped<IEventConsumer<PlaybackStopEventArgs>, PlaybackStopLogger>();
             collection.AddScoped<IEventConsumer<SessionEndedEventArgs>, SessionEndedLogger>();
             collection.AddScoped<IEventConsumer<SessionStartedEventArgs>, SessionStartedLogger>();
+
+            // TODO SyncPlay Sessions
+            collection.AddScoped<IEventConsumer<SyncPlayStartEventArgs>, SyncPlayStartLogger>();
 
             // System consumers
             collection.AddScoped<IEventConsumer<PendingRestartEventArgs>, PendingRestartNotifier>();
