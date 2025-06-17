@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Controller.SyncPlay.PlaybackRequests;
 using MediaBrowser.Model.SyncPlay;
@@ -154,6 +155,20 @@ namespace MediaBrowser.Controller.SyncPlay.GroupStates
             var playQueueUpdate = context.GetPlayQueueUpdate(PlayQueueUpdateReason.NewPlaylist);
             var update = new SyncPlayPlayQueueUpdate(context.GroupId, playQueueUpdate);
             context.SendGroupUpdate(session, SyncPlayBroadcastType.AllGroup, update, cancellationToken);
+
+            var eventArgs = new SyncPlayStartEventArgs
+            {
+                Item = request.PlayingQueue,
+                Users = context.GetParticipants(),
+                MediaSourceId = info.MediaSourceId,
+                MediaInfo = info.Item,
+                DeviceName = session.DeviceName,
+                ClientName = session.Client,
+                DeviceId = session.DeviceId,
+                Session = session,
+                PlaybackPositionTicks = info.PositionTicks,
+                PlaySessionId = info.PlaySessionId
+            };
 
             // Reset status of sessions and await for all Ready events.
             context.SetAllBuffering(true);
