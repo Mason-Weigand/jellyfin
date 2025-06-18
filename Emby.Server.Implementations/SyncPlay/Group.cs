@@ -139,15 +139,6 @@ namespace Emby.Server.Implementations.SyncPlay
         public DateTime LastActivity { get; set; }
 
         /// <summary>
-        /// Gets current participants.
-        /// </summary>
-        /// <returns>The list of sessions in the group.</returns>
-        public IEnumerable<string> GetParticipants()
-        {
-            return _participants.Values.Select(member => member.SessionId);
-        }
-
-        /// <summary>
         /// Adds the session to the group.
         /// </summary>
         /// <param name="session">The session.</param>
