@@ -58,12 +58,6 @@ namespace MediaBrowser.Controller.SyncPlay
         PlayQueueManager PlayQueue { get; }
 
         /// <summary>
-        /// Gets current participants.
-        /// </summary>
-        /// <returns>The list of sessions in the group.</returns>
-        public IEnumerable<string> GetParticipants();
-
-        /// <summary>
         /// Sets a new state.
         /// </summary>
         /// <param name="state">The new state.</param>
