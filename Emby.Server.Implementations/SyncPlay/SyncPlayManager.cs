@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using MediaBrowser.Controller.Events;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Controller.SyncPlay;
@@ -37,6 +38,11 @@ namespace Emby.Server.Implementations.SyncPlay
         /// The session manager.
         /// </summary>
         private readonly ISessionManager _sessionManager;
+
+        /// <summary>
+        /// The event manager.
+        /// </summary>
+        private readonly IEventManager _eventManager;
 
         /// <summary>
         /// The library manager.
@@ -77,16 +83,19 @@ namespace Emby.Server.Implementations.SyncPlay
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="userManager">The user manager.</param>
         /// <param name="sessionManager">The session manager.</param>
+        /// <param name="eventManager">The event manager.</param>
         /// <param name="libraryManager">The library manager.</param>
         public SyncPlayManager(
             ILoggerFactory loggerFactory,
             IUserManager userManager,
             ISessionManager sessionManager,
+            IEventManager eventManager,
             ILibraryManager libraryManager)
         {
             _loggerFactory = loggerFactory;
             _userManager = userManager;
             _sessionManager = sessionManager;
+            _eventManager = eventManager;
             _libraryManager = libraryManager;
             _logger = loggerFactory.CreateLogger<SyncPlayManager>();
             _sessionManager.SessionEnded += OnSessionEnded;
@@ -347,6 +356,12 @@ namespace Emby.Server.Implementations.SyncPlay
 
                     // Apply requested changes to group.
                     group.HandleRequest(session, request, cancellationToken);
+
+                    _logger.LogDebug("Received {RequestType} request", request.Action);
+                    if (request.Action == PlaybackRequestType.Play)
+                    {
+                        _logger.LogDebug("Session {SessionId} requested {RequestType} in group {GroupId}.", session.Id, request.Action, group.GroupId.ToString());
+                    }
                 }
             }
             else
