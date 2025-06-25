@@ -95,37 +95,45 @@ namespace Emby.Server.Implementations.Session
         }
 
         /// <inheritdoc />
-        public Task SendMessage<T>(
+        /// This needs to be looked at more for sessions with multiple sockets
+        public async Task SendMessage<T>(
             SessionMessageType name,
             Guid messageId,
             T data,
             CancellationToken cancellationToken)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
-            IWebSocketConnection? socket;
+            IWebSocketConnection[] sockets;
             try
             {
                 _socketsLock.EnterReadLock();
-                socket = _sockets.Where(i => i.State == WebSocketState.Open).MaxBy(i => i.LastActivityDate);
+                sockets = _sockets.Where(i => i.State == WebSocketState.Open).ToArray();
             }
             finally
             {
                 _socketsLock.ExitReadLock();
             }
 
-            if (socket is null)
+            if (sockets is null)
             {
-                return Task.CompletedTask;
+                await Task.CompletedTask.ConfigureAwait(false);
+                return;
             }
 
-            return socket.SendAsync(
-                new OutboundWebSocketMessage<T>
-                {
-                    Data = data,
-                    MessageType = name,
-                    MessageId = messageId
-                },
-                cancellationToken);
+            var tasks = new Task[sockets.Length];
+            for (var i = 0; i < tasks.Length; ++i)
+            {
+                tasks[i] = sockets[i].SendAsync(
+                    new OutboundWebSocketMessage<T>
+                    {
+                        Data = data,
+                        MessageType = name,
+                        MessageId = messageId
+                    },
+                    cancellationToken);
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
