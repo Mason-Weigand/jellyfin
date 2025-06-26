@@ -96,7 +96,7 @@ namespace Emby.Server.Implementations.Session
 
         /// <inheritdoc />
         /// This needs to be looked at more for sessions with multiple sockets
-        public async Task SendMessage<T>(
+        public Task SendMessage<T>(
             SessionMessageType name,
             Guid messageId,
             T data,
@@ -116,8 +116,7 @@ namespace Emby.Server.Implementations.Session
 
             if (sockets is null)
             {
-                await Task.CompletedTask.ConfigureAwait(false);
-                return;
+                return Task.CompletedTask;
             }
 
             var tasks = new Task[sockets.Length];
@@ -133,7 +132,7 @@ namespace Emby.Server.Implementations.Session
                     cancellationToken);
             }
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
